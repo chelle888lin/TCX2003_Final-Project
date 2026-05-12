@@ -61,6 +61,17 @@ def register():
 
     return "Student Registered Successfully"
 
+# =========================
+# NEW USER REGISTRATION PAGE
+# =========================
+
+@app.route("/register_page")
+def register_page():
+    return render_template("login-NewUser.html")
+
+@app.route("/login")
+def index():
+    return render_template("login.html")
 
 # =========================
 # LOGIN USER
@@ -121,15 +132,10 @@ def login():
 
 @app.route("/home")
 def home():
-
     if "username" not in session:
         return redirect("/")
 
-    return f"""
-    <h1>Welcome {session['username']}</h1>
-    <p>Login Successful</p>
-    """
-
+    return render_template("home.html", user=session['username'])
 
 # =========================
 # LOGOUT
