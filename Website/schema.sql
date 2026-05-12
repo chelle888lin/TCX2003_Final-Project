@@ -35,17 +35,44 @@ CREATE TABLE sessions (
 );
 
 -- =============================================
--- 3. SUBMISSIONS TABLE 
+-- 3. ASSESSMENTS TABLE (New)
+-- =============================================
+-- Groups multiple tasks together (e.g., "Lab 1", "Final Exam")
+CREATE TABLE assessments (
+    aid INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    due_date DATETIME NOT NULL,
+    description TEXT
+);
+
+-- =============================================
+-- 4. TASKS TABLE (New)
+-- =============================================
+-- Specific questions or coding challenges within an assessment
+CREATE TABLE tasks (
+    tid INT AUTO_INCREMENT PRIMARY KEY,
+    aid INT NOT NULL,
+    task_name VARCHAR(255) NOT NULL,
+    max_score INT DEFAULT 10,
+    CONSTRAINT fk_assessment_task FOREIGN KEY (aid) 
+        REFERENCES assessments(aid) ON DELETE CASCADE
+);
+
+-- =============================================
+-- 5. SUBMISSIONS TABLE (Modified for 3NF)
 -- =============================================
 CREATE TABLE submissions (
     submission_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
+    tid INT NOT NULL,  -- Linked to Task instead of Assessment to avoid transitive dependency
     query_text TEXT NOT NULL,
     score INT DEFAULT 0,
     status VARCHAR(20) DEFAULT 'Pending',
+    attempt_number INT DEFAULT 1,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (username) 
-    REFERENCES users(username)
-    ON DELETE CASCADE
+    CONSTRAINT fk_user_submission FOREIGN KEY (username) 
+        REFERENCES users(username) ON DELETE CASCADE,
+    CONSTRAINT fk_task_submission FOREIGN KEY (tid) 
+        REFERENCES tasks(tid) ON DELETE CASCADE
 );
