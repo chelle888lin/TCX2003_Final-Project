@@ -89,7 +89,7 @@ def login():
         session["role"] = user["role"]
         return redirect("/home")
 
-    return "Invalid Username or Password"
+    return render_template("login.html", error="Invalid Username or Password")
 
 
 # =========================
