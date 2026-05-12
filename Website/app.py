@@ -143,6 +143,26 @@ def change_password():
     return render_template("change_password.html")
 
 # =========================
+# Submit SQL Page
+# =========================
+@app.route("/submitSQL-student")
+def submit_sql():
+    if "username" not in session:
+        return redirect("/")
+    
+    return render_template("submitSQL-student.html")
+
+# =========================
+# Scores Page
+# =========================
+@app.route("/scores-student")
+def scores():
+    if "username" not in session:
+        return redirect("/")
+    
+    return render_template("scores-student.html")
+
+# =========================
 # Leaderboard
 # =========================
 @app.route("/leaderboard-student")
