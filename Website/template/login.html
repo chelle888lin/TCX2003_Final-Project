@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TCX2003 Login</title>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:Arial, sans-serif;
+    }
+
+    body{
+      height:100vh;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      background:#f4f6f9;
+    }
+
+    .login-container{
+      width:100%;
+      max-width:400px;
+      background:white;
+      padding:40px;
+      border-radius:12px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:10px;
+    }
+
+    p{
+      text-align:center;
+      margin-bottom:25px;
+      color:#666;
+    }
+
+    .form-group{
+      margin-bottom:20px;
+    }
+
+    label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:bold;
+    }
+
+    input{
+      width:100%;
+      padding:12px;
+      border:1px solid #ccc;
+      border-radius:8px;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      background:#2563eb;
+      color:white;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    button:hover{
+      background:#1d4ed8;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+
+    <h1>TCX2003 Portal</h1>
+
+    <p>Secure Student Login</p>
+
+    <!-- LOGIN FORM -->
+
+    <form action="/login" method="POST">
+
+      <div class="form-group">
+        <label>Username</label>
+
+        <input
+          type="text"
+          name="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+
+        <input
+          type="password"
+          name="password"
+          required
+        >
+      </div>
+
+      <button type="submit">
+        Login
+      </button>
+
+    </form>
+
+    <br>
+
+    <!-- REGISTER FORM -->
+
+    <form action="/register" method="POST">
+
+      <div class="form-group">
+        <label>New Username</label>
+
+        <input
+          type="text"
+          name="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label>New Password</label>
+
+        <input
+          type="password"
+          name="password"
+          required
+        >
+      </div>
+
+      <button type="submit">
+        Register
+      </button>
+
+    </form>
+
+  </div>
+
+</body>
+</html>
