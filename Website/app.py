@@ -38,20 +38,20 @@ def register_page():
 def register():
     username = request.form["username"]
     password = request.form["password"]
+    role = request.form["role"] # Captured from your new dropdown
 
-    hashed_password = bcrypt.hashpw(
-        password.encode("utf-8"),
-        bcrypt.gensalt()
-    )
+    hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-    sql = "INSERT INTO students (username, password_hash) VALUES (%s, %s)"
-    values = (username, hashed_password.decode("utf-8"))
+    # Pointing to the new 'users' table
+    sql = "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, %s)"
+    values = (username, hashed_password.decode("utf-8"), role)
 
     cursor.execute(sql, values)
     db.commit()
 
-    # Log them in automatically and redirect to home
+    # Log them in automatically
     session["username"] = username
+    session["role"] = role
     return redirect("/home")
 
 # =========================
@@ -62,14 +62,15 @@ def login():
     username = request.form["username"]
     password = request.form["password"]
 
-    sql = "SELECT * FROM students WHERE username = %s"
+    # Pointing to 'users' table
+    sql = "SELECT * FROM users WHERE username = %s"
     cursor.execute(sql, (username,))
     user = cursor.fetchone()
 
     if user:
-        stored_hash = user["password_hash"]
-        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
+        if bcrypt.checkpw(password.encode("utf-8"), user["password_hash"].encode("utf-8")):
             session["username"] = username
+            session["role"] = user["role"] # Store the role in the session
             return redirect("/home")
 
     return "Invalid Username or Password"
@@ -81,7 +82,7 @@ def login():
 def home():
     if "username" not in session:
         return redirect("/")
-    return render_template("home.html", user=session['username'])
+    return render_template("home.html", user=session['username'], role=session['role'])
 
 # =========================
 # LOGOUT
