@@ -96,7 +96,7 @@ def home():
         return redirect("/")
 
     return render_template(
-        "home.html",
+        "home-student.html",
         user=session["username"],
         role=session["role"]
     )
