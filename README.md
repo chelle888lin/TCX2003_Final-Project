@@ -10,10 +10,10 @@
 2. Login page (new user) - done
 3. Logout page - done
 4. **student dashboard view**
-   - home
-   - submit sql / assessment [SQL code submission form]
-   - scores [View personal scores]
-   - leaderboard [View the top 5 students ranked by average score]
+   - home [usage: summary overview]
+   - submit sql / assessment [uasge: SQL code submission form]
+   - scores [usage: View personal scores]
+   - leaderboard [usage: View the top 5 students ranked by average score]
    - change password (to be the same page used for teacher dashboard view) - done
 5. **teacher dashboard view** [enhancement/optional]
    - home
