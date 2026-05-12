@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TCX2003 Password Change</title>
+    <title>TCX2003 Portal</title>
 
     <style>
         body {
@@ -25,8 +25,15 @@
             text-align: center;
         }
 
-        h2 { margin-bottom: 0.5rem; }
-        p { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; }
+        h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
 
         .form-group {
             text-align: left;
@@ -59,7 +66,9 @@
             margin-top: 1rem;
         }
 
-        button:hover { background-color: #3046c9; }
+        button:hover {
+            background-color: #3046c9;
+        }
 
         a {
             display: block;
@@ -74,10 +83,11 @@
 <body>
 
 <div class="card">
+
     <h2>TCX2003 Portal</h2>
     <p>Login to continue</p>
 
-    <!-- FIXED: login now goes to /login -->
+    <!-- LOGIN FORM -->
     <form action="/login" method="POST">
 
         <div class="form-group">
@@ -94,7 +104,38 @@
     </form>
 
     <a href="/register_page">Create Account</a>
+
 </div>
+
+<!-- POPUP ERROR SCRIPT -->
+<script>
+    const error = "{{ error }}";
+
+    if (error && error !== "None") {
+        const div = document.createElement("div");
+        div.innerText = error;
+
+        div.style.position = "fixed";
+        div.style.top = "40%";
+        div.style.left = "50%";
+        div.style.transform = "translate(-50%, -50%)";
+        div.style.background = "#ef4444";
+        div.style.color = "white";
+        div.style.padding = "14px 20px";
+        div.style.borderRadius = "10px";
+        div.style.boxShadow = "0 8px 20px rgba(0,0,0,0.25)";
+        div.style.zIndex = "9999";
+        div.style.fontSize = "14px";
+        div.style.minWidth = "250px";
+        div.style.textAlign = "center";
+
+        document.body.appendChild(div);
+
+        setTimeout(() => {
+            div.remove();
+        }, 3000);
+    }
+</script>
 
 </body>
 </html>
