@@ -22,12 +22,10 @@ cursor = db.cursor(dictionary=True)
 # =========================
 @app.route("/")
 def index():
-    # If already logged in, go home
     if "username" in session:
         return redirect("/home")
 
     return render_template("login.html")
-
 
 # =========================
 # REGISTER PAGE
@@ -36,9 +34,8 @@ def index():
 def register_page():
     return render_template("login-NewUser.html")
 
-
 # =========================
-# REGISTER USER
+# REGISTER USER (adding user to database)
 # =========================
 @app.route("/register", methods=["POST"])
 def register():
@@ -64,16 +61,24 @@ def register():
     session["role"] = role
     return redirect("/home")
 
-
 # =========================
 # LOGIN
 # =========================
-@app.route("/login", methods=["POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
+
+    # If user manually visits /login in browser
+    if request.method == "GET":
+        return redirect("/")   # send them back to login page
+
     username = request.form.get("username")
     password = request.form.get("password")
 
-    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
+    cursor.execute(
+        "SELECT * FROM users WHERE username = %s",
+        (username,)
+    )
+
     user = cursor.fetchone()
 
     if user and bcrypt.checkpw(
@@ -94,13 +99,12 @@ def login():
 def home():
     if "username" not in session:
         return redirect("/")
-
+    
     return render_template(
         "home-student.html",
         user=session["username"],
         role=session["role"]
     )
-
 
 # =========================
 # CHANGE PASSWORD
@@ -138,6 +142,15 @@ def change_password():
 
     return render_template("change_password.html")
 
+# =========================
+# Leaderboard
+# =========================
+@app.route("/leaderboard-student")
+def leaderboard():
+    if "username" not in session:
+        return redirect("/")
+    
+    return render_template("leaderboard-student.html")
 
 # =========================
 # LOGOUT
@@ -152,4 +165,4 @@ def logout():
 # RUN APP
 # =========================
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
