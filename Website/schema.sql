@@ -5,13 +5,18 @@ CREATE DATABASE IF NOT EXISTS tcx2003;
 USE tcx2003;
 
 -- =============================================
--- 1. USERS TABLE
+-- 1. USERS TABLE (Modified)
 -- =============================================
 CREATE TABLE users (
     username VARCHAR(50) PRIMARY KEY,
     password_hash TEXT NOT NULL,
     role ENUM('student', 'teacher') NOT NULL DEFAULT 'student',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    -- Added to track password age for security policies
+    password_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- Added to facilitate secure password recovery/reset flows
+    reset_token VARCHAR(255) DEFAULT NULL,
+    reset_token_expiry DATETIME DEFAULT NULL
 );
 
 -- =============================================
@@ -23,7 +28,6 @@ CREATE TABLE sessions (
     session_token VARCHAR(255) NOT NULL,
     login_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    -- Ensuring every session belongs to a valid user
     CONSTRAINT fk_user_session
         FOREIGN KEY (username) 
         REFERENCES users(username)
