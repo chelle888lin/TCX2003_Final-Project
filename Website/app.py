@@ -6,152 +6,90 @@ import secrets
 app = Flask(__name__)
 app.secret_key = "your_secret_key"
 
-
 # =========================
 # DATABASE CONNECTION
 # =========================
-
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    password="yourpassword",
+    password="Pass1234",
     database="tcx2003"
 )
-
 cursor = db.cursor(dictionary=True)
 
-
 # =========================
-# LOGIN PAGE
+# LOGIN PAGE (Changed to "/" so it's the landing page)
 # =========================
-
 @app.route("/")
 def index():
     return render_template("login.html")
 
+# =========================
+# NEW USER REGISTRATION PAGE
+# =========================
+@app.route("/register_page")
+def register_page():
+    return render_template("login-NewUser.html")
 
 # =========================
-# REGISTER USER
+# REGISTER USER LOGIC
 # =========================
-
 @app.route("/register", methods=["POST"])
 def register():
-
     username = request.form["username"]
     password = request.form["password"]
 
-    # HASH PASSWORD
     hashed_password = bcrypt.hashpw(
         password.encode("utf-8"),
         bcrypt.gensalt()
     )
 
-    sql = """
-    INSERT INTO students (username, password_hash)
-    VALUES (%s, %s)
-    """
-
-    values = (
-        username,
-        hashed_password.decode("utf-8")
-    )
+    sql = "INSERT INTO students (username, password_hash) VALUES (%s, %s)"
+    values = (username, hashed_password.decode("utf-8"))
 
     cursor.execute(sql, values)
     db.commit()
 
-    return "Student Registered Successfully"
+    # Log them in automatically and redirect to home
+    session["username"] = username
+    return redirect("/home")
 
 # =========================
-# NEW USER REGISTRATION PAGE
+# LOGIN USER LOGIC
 # =========================
-
-@app.route("/register_page")
-def register_page():
-    return render_template("login-NewUser.html")
-
-@app.route("/login")
-def index():
-    return render_template("login.html")
-
-# =========================
-# LOGIN USER
-# =========================
-
 @app.route("/login", methods=["POST"])
 def login():
-
     username = request.form["username"]
     password = request.form["password"]
 
-    sql = """
-    SELECT * FROM students
-    WHERE username = %s
-    """
-
+    sql = "SELECT * FROM students WHERE username = %s"
     cursor.execute(sql, (username,))
     user = cursor.fetchone()
 
     if user:
-
         stored_hash = user["password_hash"]
-
-        # VERIFY HASHED PASSWORD
-        if bcrypt.checkpw(
-            password.encode("utf-8"),
-            stored_hash.encode("utf-8")
-        ):
-
-            # CREATE SESSION TOKEN
-            session_token = secrets.token_hex(16)
-
+        if bcrypt.checkpw(password.encode("utf-8"), stored_hash.encode("utf-8")):
             session["username"] = username
-            session["session_token"] = session_token
-
-            # SAVE SESSION TO DATABASE
-            sql2 = """
-            INSERT INTO sessions
-            (username, session_token)
-            VALUES (%s, %s)
-            """
-
-            cursor.execute(sql2, (
-                username,
-                session_token
-            ))
-
-            db.commit()
-
             return redirect("/home")
 
     return "Invalid Username or Password"
 
-
 # =========================
 # HOME PAGE
 # =========================
-
 @app.route("/home")
 def home():
     if "username" not in session:
         return redirect("/")
-
     return render_template("home.html", user=session['username'])
 
 # =========================
 # LOGOUT
 # =========================
-
 @app.route("/logout")
 def logout():
-
     session.clear()
-
     return redirect("/")
-
-
-# =========================
-# RUN APP
-# =========================
 
 if __name__ == "__main__":
     app.run(debug=True)

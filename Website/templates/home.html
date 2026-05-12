@@ -210,19 +210,19 @@
   <!-- SIDEBAR -->
 
   <div class="sidebar">
-
-    <h2>TCX2003</h2>
-
-    <ul>
-      <li>🏠 Home</li>
-      <li>📤 Submit SQL</li>
-      <li>📊 Scores</li>
-      <li>🏆 Leaderboard</li>
-      <li>🔒 Change Password</li>
+  <h2>TCX2003</h2>
+  <ul>
+    <li>🏠 Home</li>
+    <li>📤 Submit SQL</li>
+    <li>📊 Scores</li>
+    <li>🏆 Leaderboard</li>
+    <li>🔒 Change Password</li>
+    
+    <a href="/logout" style="text-decoration: none; color: inherit;">
       <li>🚪 Logout</li>
-    </ul>
-
-  </div>
+    </a>
+  </ul>
+</div>
 
   <!-- MAIN -->
 
@@ -232,7 +232,7 @@
 
     <div class="topbar">
       <h1>Student Dashboard</h1>
-      <p>Welcome, Student</p>
+      <p>Welcome, {{ user }}</p>
     </div>
 
     <!-- DASHBOARD CARDS -->

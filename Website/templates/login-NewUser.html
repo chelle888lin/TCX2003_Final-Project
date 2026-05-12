@@ -74,13 +74,58 @@
       background:#1d4ed8;
     }
 
+    /* Update this selector to include both input and select */
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  
+  /* These ensure they look identical */
+  display: block;
+  background-color: white;
+  font-size: 16px; /* Prevents zoom on mobile and matches your style */
+  appearance: none; /* Optional: removes default browser styling for a cleaner look */
+}
+
+select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.back-link {
+  color: #666;
+  text-decoration: none; 
+  font-size: 0.9em;
+  transition: 0.2s; 
+}
+
+.back-link:hover {
+  text-decoration: underline; 
+  color: #2563eb; 
+}
+
+.login-link {
+  color: #2563eb;       
+  text-decoration: none; 
+  font-weight: bold;    
+  transition: 0.2s;      
+}
+
+.login-link:hover {
+  text-decoration: underline; 
+  color: #1d4ed8;            
+}
+
   </style>
 </head>
 
 <body>
   <div class="login-container">
     <h1>TCX2003 Portal</h1>
-    <p>Register as a New Member</p>
+    <p>Register as a New User</p>
 
     <form action="/register" method="POST">
       <div class="form-group">
@@ -91,17 +136,26 @@
         <label>New Password</label>
         <input type="password" name="password" required>
       </div>
+      <div class="form-group">
+        <label>I am a:</label>
+        <select name="role" required>
+          <option value="student">Student</option>
+          <option value="teacher">Teacher</option>
+        </select>
+      </div>
       <button type="submit" style="background: #10b981;">Register</button>
     </form>
 
     <div style="text-align: center; margin-top: 20px;">
-    <a href="/login" style="color: #666; text-decoration: none; font-size: 0.9em;">
-      Back to Login
-    </a>
-</div>
+      <a href="/login" class="back-link">
+        Back to Login
+      </a>
+    </div>
 
     <div style="text-align: center; margin-top: 20px;">
-        <p>Already have an account? <a href="/login" style="color: #2563eb; text-decoration: none; font-weight: bold;">Login here</a></p>
+        <p>Already have an account? <a href="/login" class="login-link">
+          Login here
+        </a></p>
     </div>
   </div>
 </body>
