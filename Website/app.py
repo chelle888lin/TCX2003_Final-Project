@@ -1,10 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session
 import mysql.connector
 import bcrypt
-import secrets
+import os
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"
+app.secret_key = os.urandom(24)
 
 # =========================
 # DATABASE CONNECTION
@@ -18,89 +18,74 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # =========================
-# LOGIN PAGE
+# LANDING PAGE (LOGIN)
 # =========================
 @app.route("/")
 def index():
+    # If already logged in, go home
+    if "username" in session:
+        return redirect("/home")
+
     return render_template("login.html")
 
+
 # =========================
-# NEW USER REGISTRATION PAGE
+# REGISTER PAGE
 # =========================
 @app.route("/register_page")
 def register_page():
     return render_template("login-NewUser.html")
 
+
 # =========================
-# REGISTER USER LOGIC
+# REGISTER USER
 # =========================
 @app.route("/register", methods=["POST"])
 def register():
-    username = request.form["username"]
-    password = request.form["password"]
-    role = request.form["role"]
+    username = request.form.get("username")
+    password = request.form.get("password")
+    role = request.form.get("role", "user")
+
+    if not username or not password:
+        return "Missing username or password"
 
     hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
-    sql = "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, %s)"
-    values = (username, hashed_password.decode("utf-8"), role)
-
-    cursor.execute(sql, values)
-    db.commit()
+    try:
+        cursor.execute(
+            "INSERT INTO users (username, password_hash, role) VALUES (%s, %s, %s)",
+            (username, hashed_password.decode("utf-8"), role)
+        )
+        db.commit()
+    except mysql.connector.IntegrityError:
+        return "Username already exists"
 
     session["username"] = username
     session["role"] = role
     return redirect("/home")
 
+
 # =========================
-# LOGIN USER LOGIC
+# LOGIN
 # =========================
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
+    username = request.form.get("username")
+    password = request.form.get("password")
 
-    sql = "SELECT * FROM users WHERE username = %s"
-    cursor.execute(sql, (username,))
+    cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cursor.fetchone()
 
-    if user:
-        if bcrypt.checkpw(password.encode("utf-8"), user["password_hash"].encode("utf-8")):
-            session["username"] = username
-            session["role"] = user["role"]
-            return redirect("/home")
+    if user and bcrypt.checkpw(
+        password.encode("utf-8"),
+        user["password_hash"].encode("utf-8")
+    ):
+        session["username"] = user["username"]
+        session["role"] = user["role"]
+        return redirect("/home")
 
     return "Invalid Username or Password"
 
-# =========================
-# CHANGE PASSWORD LOGIC
-# =========================
-@app.route("/change_password", methods=["GET", "POST"])
-def change_password():
-    # 1. Check if user is logged in
-    if "username" not in session:
-        print("Redirecting: No user in session") # Debugging line
-        return redirect("/")
-
-    if request.method == "POST":
-        new_password = request.form["new_password"]
-        confirm_password = request.form["confirm_password"]
-
-        if new_password != confirm_password:
-            return "Passwords do not match! <a href='/change_password'>Try again</a>"
-
-        # Hash and Update
-        hashed_password = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
-        
-        try:
-            sql = "UPDATE users SET password_hash = %s WHERE username = %s"
-            cursor.execute(sql, (hashed_password.decode("utf-8"), session["username"]))
-            db.commit()
-            return "Password updated! <a href='/home'>Go Home</a>"
-        except Exception as e:
-            return f"Database error: {e}"
-
-    return render_template("change_password.html")
 
 # =========================
 # HOME PAGE
@@ -109,7 +94,50 @@ def change_password():
 def home():
     if "username" not in session:
         return redirect("/")
-    return render_template("home.html", user=session['username'], role=session['role'])
+
+    return render_template(
+        "home.html",
+        user=session["username"],
+        role=session["role"]
+    )
+
+
+# =========================
+# CHANGE PASSWORD
+# =========================
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+
+    if "username" not in session:
+        return redirect("/")
+
+    if request.method == "POST":
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if not new_password or not confirm_password:
+            return "Missing fields"
+
+        if new_password != confirm_password:
+            return "Passwords do not match <a href='/change_password'>Try again</a>"
+
+        hashed_password = bcrypt.hashpw(
+            new_password.encode("utf-8"),
+            bcrypt.gensalt()
+        )
+
+        try:
+            cursor.execute(
+                "UPDATE users SET password_hash = %s WHERE username = %s",
+                (hashed_password.decode("utf-8"), session["username"])
+            )
+            db.commit()
+            return redirect("/home")
+        except Exception as e:
+            return f"Database error: {e}"
+
+    return render_template("change_password.html")
+
 
 # =========================
 # LOGOUT
@@ -119,5 +147,9 @@ def logout():
     session.clear()
     return redirect("/")
 
+
+# =========================
+# RUN APP
+# =========================
 if __name__ == "__main__":
     app.run(debug=True)
