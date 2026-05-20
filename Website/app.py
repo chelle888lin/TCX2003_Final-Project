@@ -13,8 +13,7 @@ app.secret_key = os.urandom(24)
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    port=3306,
-    password="root",
+    password="Pass1234",
     database="tcx2003"
 )
 cursor = db.cursor(dictionary=True)
